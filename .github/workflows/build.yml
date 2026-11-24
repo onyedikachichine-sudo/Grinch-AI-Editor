@@ -33,10 +33,16 @@ jobs:
           test -n "$ZIP_FILE"
           unzip -q "$ZIP_FILE" -d extracted
 
-      - name: Build APK
+    
+      - name: Fix Kotlin import
         run: |
-          cd extracted/GrinchAIEditor
-          gradle --no-daemon assembleDebug
+          FILE="extracted/GrinchAIEditor/app/src/main/java/com/grinch/aieditor/MainActivity.kt"
+          grep -q '^import androidx.compose.foundation.verticalScroll$' "$FILE" || sed -i '/^package /a import androidx.compose.foundation.verticalScroll' "$FILE"
+         
+      - name: Build APK
+          run: |
+            cd extracted/GrinchAIEditor
+            gradle --no-daemon assembleDebug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
